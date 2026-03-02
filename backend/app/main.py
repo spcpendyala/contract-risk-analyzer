@@ -14,6 +14,8 @@ app.add_middleware(
         'http://localhost:5173',
         'http://localhost:5174',
         'https://contracts.palaemonsystems.com',
+        'https://contract-risk-analyzer-eta.vercel.app',
+        'https://contract-risk-analyzer-3twnt7ury-sai-pendyalas-projects.vercel.app',
     ],
     allow_credentials=True,
     allow_methods=['*'],
