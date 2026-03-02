@@ -20,7 +20,7 @@ Return this exact structure:
       "recommendation": "<what to do about it>"
     }
   ],
-  "missing_clauses": ["<clause name>", ...]
+  "missing_clauses": ["<clause name>"]
 }
 
 Contract text:
@@ -31,13 +31,16 @@ class AIService:
         self.api_key = os.getenv('GROQ_API_KEY')
 
     async def analyze(self, contract_text: str) -> AnalysisResponse:
-        prompt = PROMPT.replace('{contract_text}', contract_text)
+        # Truncate to avoid token limits
+        truncated = contract_text[:6000]
+        prompt = PROMPT.replace('{contract_text}', truncated)
 
         url = 'https://api.groq.com/openai/v1/chat/completions'
         body = json.dumps({
             'model': 'llama-3.3-70b-versatile',
             'messages': [{'role': 'user', 'content': prompt}],
-            'temperature': 0.1
+            'temperature': 0.1,
+            'max_tokens': 1500
         }).encode('utf-8')
 
         req = urllib.request.Request(
