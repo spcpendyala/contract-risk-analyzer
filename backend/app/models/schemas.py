@@ -1,14 +1,16 @@
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import List
 
 class RiskFinding(BaseModel):
-    title: str
     category: str
     severity: str
+    clause: str
     explanation: str
-    suggestion: Optional[str] = None
+    recommendation: str
 
 class AnalysisResponse(BaseModel):
-    overall_risk: str
+    overall_score: int
+    contract_type: str
     summary: str
     findings: List[RiskFinding]
+    missing_clauses: List[str]
