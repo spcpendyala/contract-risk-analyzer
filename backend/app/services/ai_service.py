@@ -64,3 +64,5 @@ class AIService:
         except Exception as e:
             logger.error(f'Unexpected error: {e}')
             raise
+
+ai_service = AIService()
