@@ -28,16 +28,14 @@ Contract text:
 
 class AIService:
     def __init__(self):
-        self.api_key = os.getenv('GROQ_API_KEY')
+        self.api_key = os.getenv('OPENROUTER_API_KEY')
 
     async def analyze(self, contract_text: str) -> AnalysisResponse:
-        # Truncate to avoid token limits
-        truncated = contract_text[:6000]
-        prompt = PROMPT.replace('{contract_text}', truncated)
+        prompt = PROMPT.replace('{contract_text}', contract_text[:6000])
 
-        url = 'https://api.groq.com/openai/v1/chat/completions'
+        url = 'https://openrouter.ai/api/v1/chat/completions'
         body = json.dumps({
-            'model': 'llama-3.3-70b-versatile',
+            'model': 'meta-llama/llama-3.3-70b-instruct:free',
             'messages': [{'role': 'user', 'content': prompt}],
             'temperature': 0.1,
             'max_tokens': 1500
@@ -48,7 +46,9 @@ class AIService:
             data=body,
             headers={
                 'Content-Type': 'application/json',
-                'Authorization': f'Bearer {self.api_key}'
+                'Authorization': f'Bearer {self.api_key}',
+                'HTTP-Referer': 'https://contracts.palaemonsystems.com',
+                'X-Title': 'Contract Risk Analyzer'
             },
             method='POST'
         )
@@ -62,8 +62,8 @@ class AIService:
                 return AnalysisResponse(**result)
         except urllib.error.HTTPError as e:
             body = e.read().decode('utf-8')
-            logger.error(f'Groq HTTP Error {e.code}: {body}')
-            raise Exception(f'Groq API error {e.code}: {body}')
+            logger.error(f'OpenRouter HTTP Error {e.code}: {body}')
+            raise Exception(f'OpenRouter API error {e.code}: {body}')
         except Exception as e:
             logger.error(f'Unexpected error: {e}')
             raise
