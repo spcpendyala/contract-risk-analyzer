@@ -1,4 +1,4 @@
-import os, json, logging, urllib.request
+import os, json, logging, urllib.request, urllib.error
 from app.models.schemas import AnalysisResponse
 
 logger = logging.getLogger(__name__)
@@ -50,11 +50,17 @@ class AIService:
             method='POST'
         )
 
-        with urllib.request.urlopen(req) as response:
-            data = json.loads(response.read().decode('utf-8'))
-            text = data['choices'][0]['message']['content']
-            text = text.replace('```json', '').replace('```', '').strip()
-            result = json.loads(text)
-            return AnalysisResponse(**result)
-
-ai_service = AIService()
+        try:
+            with urllib.request.urlopen(req) as response:
+                data = json.loads(response.read().decode('utf-8'))
+                text = data['choices'][0]['message']['content']
+                text = text.replace('```json', '').replace('```', '').strip()
+                result = json.loads(text)
+                return AnalysisResponse(**result)
+        except urllib.error.HTTPError as e:
+            body = e.read().decode('utf-8')
+            logger.error(f'Groq HTTP Error {e.code}: {body}')
+            raise Exception(f'Groq API error {e.code}: {body}')
+        except Exception as e:
+            logger.error(f'Unexpected error: {e}')
+            raise
