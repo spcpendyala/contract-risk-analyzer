@@ -35,7 +35,7 @@ class AIService:
 
         url = 'https://openrouter.ai/api/v1/chat/completions'
         body = json.dumps({
-            'model': 'google/gemini-2.0-flash-exp:free',
+            'model': 'google/gemini-2.0-flash-lite-001',
             'messages': [{'role': 'user', 'content': prompt}],
             'temperature': 0.1,
             'max_tokens': 1500
